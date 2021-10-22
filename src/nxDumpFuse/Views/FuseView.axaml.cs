@@ -1,5 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using nxDumpFuse.Model;
+using nxDumpFuse.Model.Enums;
 using nxDumpFuse.ViewModels;
 
 namespace nxDumpFuse.Views
@@ -14,6 +17,12 @@ namespace nxDumpFuse.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void FuseSimpleLog_OnLoadingRow(object? sender, DataGridRowEventArgs e)
+        {
+            if (e.Row.DataContext is FuseSimpleLog { Type: FuseSimpleLogType.Error })
+                e.Row.Background = Brushes.Red;
         }
     }
 }

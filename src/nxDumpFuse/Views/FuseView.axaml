@@ -46,7 +46,8 @@
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto"
                     VerticalAlignment="Top"
-                    Height="300">
+                    Height="300"
+                    LoadingRow="FuseSimpleLog_OnLoadingRow">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
                                             Foreground="{Binding Color}" FontSize="12" />
