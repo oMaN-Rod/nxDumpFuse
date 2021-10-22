@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reactive;
 using Avalonia.Controls;
 using nxDumpFuse.Interfaces;
 using nxDumpFuse.Model;
-using nxDumpFuse.Services;
+using nxDumpFuse.Model.Enums;
 using ReactiveUI;
 
 namespace nxDumpFuse.ViewModels

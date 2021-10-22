@@ -1,6 +1,5 @@
 ﻿using nxDumpFuse.Extensions;
 using nxDumpFuse.Interfaces;
-using nxDumpFuse.Model;
 using nxDumpFuse.Services;
 using Splat;
 
