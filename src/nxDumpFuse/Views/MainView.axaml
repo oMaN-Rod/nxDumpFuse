@@ -1,35 +1,35 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="clr-namespace:nxDumpFuse.ViewModels;assembly=nxDumpFuse"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="1350" d:DesignHeight="700"        
-             x:Class="nxDumpFuse.Views.MainView"         
+             mc:Ignorable="d" d:DesignWidth="1350" d:DesignHeight="700"
+             x:Class="nxDumpFuse.Views.MainView"
              FontSize="14"
              Foreground="{StaticResource SystemBaseHighColor}"
              xmlns:views="clr-namespace:nxDumpFuse.Views;assembly=nxDumpFuse">
-  <Panel>
-    <DockPanel HorizontalAlignment="Stretch">
-      <ExperimentalAcrylicBorder DockPanel.Dock="Left" Width="150">
-        <ExperimentalAcrylicBorder.Material>
-          <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.85" TintOpacity="1" />
-        </ExperimentalAcrylicBorder.Material>
-      </ExperimentalAcrylicBorder>
-      <ExperimentalAcrylicBorder IsHitTestVisible="False">
-        <ExperimentalAcrylicBorder.Material>
-          <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.85" TintOpacity="1" />
-        </ExperimentalAcrylicBorder.Material>
-        <TextBlock Text="{Binding #TabControl.SelectedItem.Header}" Margin="40 20" FontSize="32" FontWeight="Light" />
-      </ExperimentalAcrylicBorder>
-    </DockPanel>          
-       
-    <TabControl x:Name="TabControl" Classes="sidebar" Margin="0 40 0 20">
-      <TabItem Header="Fuse">
-        <views:FuseView DataContext="{Binding FuseViewModel}"/>
-      </TabItem>
-      <TabItem Header="About">
-        <views:AboutView DataContext="{Binding AboutViewModel}"/>
-      </TabItem>
-    </TabControl>    
-  </Panel>
+    <Panel>
+        <DockPanel HorizontalAlignment="Stretch">
+            <ExperimentalAcrylicBorder DockPanel.Dock="Left" Width="150">
+                <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.85" TintOpacity="1" />
+                </ExperimentalAcrylicBorder.Material>
+            </ExperimentalAcrylicBorder>
+            <ExperimentalAcrylicBorder IsHitTestVisible="False">
+                <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.85" TintOpacity="1" />
+                </ExperimentalAcrylicBorder.Material>
+                <TextBlock Text="{Binding #TabControl.SelectedItem.Header}" Margin="40 20" FontSize="32"
+                           FontWeight="Light" />
+            </ExperimentalAcrylicBorder>
+        </DockPanel>
+
+        <TabControl x:Name="TabControl" Classes="sidebar" Margin="0 40 0 20">
+            <TabItem Header="Fuse">
+                <views:FuseView DataContext="{Binding FuseViewModel}" />
+            </TabItem>
+            <TabItem Header="About">
+                <views:AboutView DataContext="{Binding AboutViewModel}" />
+            </TabItem>
+        </TabControl>
+    </Panel>
 </UserControl>

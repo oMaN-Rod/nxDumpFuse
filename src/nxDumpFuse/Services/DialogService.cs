@@ -1,18 +1,18 @@
 ﻿using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using nxDumpFuse.Interfaces;
-using nxDumpFuse.ViewModels;
 
 namespace nxDumpFuse.Services
 {
     public class DialogService : IDialogService
     {
         private readonly IMainWindowProvider _mainWindowProvider;
+
         public DialogService(IMainWindowProvider mainWindowProvider)
         {
             _mainWindowProvider = mainWindowProvider;
         }
+
         public async Task<string> ShowOpenFileDialogAsync(string title, FileDialogFilter filter)
         {
             var openFileDialog = new OpenFileDialog()

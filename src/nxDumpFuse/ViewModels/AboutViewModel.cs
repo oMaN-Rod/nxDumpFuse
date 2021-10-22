@@ -9,8 +9,7 @@ namespace nxDumpFuse.ViewModels
 {
     public class AboutViewModel : ViewModelBase, IAboutViewModel
     {
-        private string _gitHubUrl = "https://github.com/oMaN-Rod/nxDumpFuse";
-        private string _explorer = "explorer.exe";
+        private const string GitHubUrl = "https://github.com/oMaN-Rod/nxDumpFuse";
 
         public AboutViewModel()
         {
@@ -20,28 +19,29 @@ namespace nxDumpFuse.ViewModels
         public ReactiveCommand<Unit, Unit> OpenGithubCommand { get; }
 
         public string UsageText => BuildUsageText();
+
         public string AuthorInfo => "Made for fun by oMaN-Rod, check me out on -->";
 
-        private void OpenGithub()
+        private static void OpenGithub()
         {
             try
             {
-                Process.Start(_explorer, _gitHubUrl);
+                Process.Start("explorer.exe", GitHubUrl);
             }
             catch
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    Process.Start("xdg-open", _gitHubUrl);
+                    Process.Start("xdg-open", GitHubUrl);
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    Process.Start("open", _gitHubUrl);
+                    Process.Start("open", GitHubUrl);
                 }
             }
         }
 
-        private string BuildUsageText()
+        private static string BuildUsageText()
         {
             var sb = new StringBuilder();
             sb.AppendLine("To fuse files make sure all file parts are alone in a directory with no other files, i.e");
