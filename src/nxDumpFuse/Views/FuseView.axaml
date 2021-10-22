@@ -34,7 +34,10 @@
                         HorizontalContentAlignment="Center" Margin="2" />
             </StackPanel>
 
-          <DataGrid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+            <Expander Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                      Header="Log"
+                      Margin="2">
+                <DataGrid
                     x:Name="FuseSimpleLog"
                     Items="{Binding LogItems}"
                     CanUserSortColumns="False"
@@ -44,13 +47,14 @@
                     HorizontalScrollBarVisibility="Auto"
                     VerticalAlignment="Top"
                     Height="300">
-              <DataGrid.Columns>
-                  <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
-                                      Foreground="{Binding Color}" FontSize="12" />
-                  <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto" FontSize="12" />
-                  <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto" FontSize="12" />
-              </DataGrid.Columns>
-          </DataGrid>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
+                                            Foreground="{Binding Color}" FontSize="12" />
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto" FontSize="12" />
+                        <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto" FontSize="12" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Expander>
         </Grid>
     </DockPanel>
 
