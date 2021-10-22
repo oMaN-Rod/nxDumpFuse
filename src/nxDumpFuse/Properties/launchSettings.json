@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "nxDumpFuse": {
+      "commandName": "Project",
+      "commandLineArgs": "/l Trace"
+    }
+  }
+}

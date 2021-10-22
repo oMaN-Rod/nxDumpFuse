@@ -1,0 +1,8 @@
+﻿[Desktop Entry]
+Type=Application
+Terminal=false
+Name=Run Executable
+Comment=Run Executable
+Icon=application.png
+Exec="/bin/sh" -c %f
+Categories=Application;

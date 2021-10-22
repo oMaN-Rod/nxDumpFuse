@@ -1,0 +1,29 @@
+<nxDumpFuse:FluentWindow xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:vm="clr-namespace:nxDumpFuse.ViewModels;assembly=nxDumpFuse"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+              x:Class="nxDumpFuse.Views.MainWindow"
+              x:Name="MainWindow"
+              xmlns:local="clr-namespace:nxDumpFuse.Views"
+              xmlns:nxDumpFuse="clr-namespace:nxDumpFuse"
+              Icon="{x:Null}"
+              Title="nxDumpFuse"
+              WindowStartupLocation="CenterScreen"
+              Background="{x:Null}"
+              Width="1280" Height="720">
+  <nxDumpFuse:FluentWindow.Styles>
+    <Style Selector="TitleBar:fullscreen">
+      <Setter Property="Background" Value="#7f000000" />
+    </Style>
+  </nxDumpFuse:FluentWindow.Styles>
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Panel Margin="{Binding #MainWindow.OffScreenMargin}">
+    <local:MainView DataContext="{Binding MainViewModel}"/>
+  </Panel>
+</nxDumpFuse:FluentWindow>

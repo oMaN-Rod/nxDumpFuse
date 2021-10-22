@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="nxDumpFuse.Views.FuseView"
+             xmlns:vm="clr-namespace:nxDumpFuse.ViewModels"
+             x:DataType="vm:FuseViewModel"
+             Name="FuseViewControl">
+  <DockPanel LastChildFill="True">
+    <Grid Margin="20" DockPanel.Dock="Top">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
+
+      <Button Grid.Row="0" Grid.Column="0" Command="{Binding SelectInputFileCommand}" Content="Input" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+      <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center" Text="{Binding InputFilePath}" Name="InputFileTextBox"/>
+
+      <Button Grid.Row="1" Grid.Column="0" Command="{Binding SelectOutputFolderCommand}" Content="Output" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+      <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"  Text="{Binding OutputDir}"/>
+
+      <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ProgressPartText}" HorizontalAlignment="Right" Margin="2"/>
+      <ProgressBar Grid.Row="2" Grid.Column="1" Margin="2" Height="10" Value="{Binding ProgressPart}"/>
+      <TextBlock Grid.Row="3" Grid.Column="0" Text="Total" HorizontalAlignment="Right"  Margin="2"/>
+      <ProgressBar Grid.Row="3" Grid.Column="1" Margin="2" Height="10" Value="{Binding Progress}"/>
+
+      <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button  Command="{Binding FuseCommand}" Content="Fuse" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"/>
+        <Button  Command="{Binding StopCommand}" Content="Stop" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"/>
+      </StackPanel>
+
+      <DataGrid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                x:Name="FuseSimpleLog"
+                Items="{Binding LogItems}"
+                CanUserSortColumns="False"
+                CanUserResizeColumns="True"
+                CanUserReorderColumns="True"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Auto"
+                Width="{Binding #InputFileTextBox.Width}"
+                VerticalAlignment="Top"
+                Margin="4"
+                Height="350">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto" Foreground="{Binding Color}"/>
+            <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto"/>
+            <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Grid>
+  </DockPanel>
+  
+</UserControl>
