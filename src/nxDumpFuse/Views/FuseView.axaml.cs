@@ -3,7 +3,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using nxDumpFuse.Model;
 using nxDumpFuse.Model.Enums;
-using nxDumpFuse.ViewModels;
 
 namespace nxDumpFuse.Views
 {
