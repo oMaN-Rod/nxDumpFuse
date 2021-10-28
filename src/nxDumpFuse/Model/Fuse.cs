@@ -75,12 +75,12 @@ namespace nxDumpFuse.Model
             }
 
             var inputFiles = GetInputFiles();
-            if (inputFiles.Length == 0)
+            if (inputFiles.Count == 0)
             {
                 Log(FuseSimpleLogType.Error, "No input files found");
                 return;
             }
-
+            inputFiles.Sort();
             FuseFiles(inputFiles, _outputFilePath);
         }
 
@@ -186,11 +186,11 @@ namespace nxDumpFuse.Model
             return totalFileSize;
         }
 
-        private string[] GetInputFiles()
+        private List<string> GetInputFiles()
         {
             var inputDir = Path.GetDirectoryName(_inputFilePath);
             if (string.IsNullOrEmpty(inputDir)) inputDir = Path.GetPathRoot(_inputFilePath);
-            return inputDir != null ? Directory.GetFiles(inputDir) : new string[] { };
+            return inputDir != null ? Directory.GetFiles(inputDir, $"{Path.GetFileNameWithoutExtension(_inputFilePath)}*").ToList() : new List<string>();
         }
 
         public void StopFuse()

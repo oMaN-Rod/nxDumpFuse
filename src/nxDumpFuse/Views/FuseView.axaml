@@ -61,7 +61,7 @@
                       </DataGrid.Columns>
                   </DataGrid>
                   <Button Grid.Column="1" Command="{Binding ClearLogCommand}" Content="Clear" HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Center" VerticalAlignment="Top" Margin="4" />
+                          HorizontalContentAlignment="Center" VerticalAlignment="Top" Margin=" 4 0 0 0" />
                   </Grid>
 
                 </Expander>
