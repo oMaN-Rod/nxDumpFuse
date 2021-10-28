@@ -22,6 +22,7 @@ namespace nxDumpFuse.ViewModels
             SelectOutputFolderCommand = ReactiveCommand.Create(SelectOutputFolder);
             FuseCommand = ReactiveCommand.Create(FuseNxDump);
             StopCommand = ReactiveCommand.Create(StopDump);
+            ClearLogCommand = ReactiveCommand.Create(ClearLog);
             ProgressPartText = "Part 0/0";
         }
 
@@ -29,11 +30,14 @@ namespace nxDumpFuse.ViewModels
 
         public ReactiveCommand<Unit, Unit> SelectOutputFolderCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ClearLogCommand { get; }
+
         public ReactiveCommand<Unit, Unit> FuseCommand { get; }
 
         public ReactiveCommand<Unit, Unit> StopCommand { get; }
 
         private string _inputFilePath = string.Empty;
+
         public string InputFilePath
         {
             get => _inputFilePath;
@@ -41,6 +45,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _outputDir = string.Empty;
+
         public string OutputDir
         {
             get => _outputDir;
@@ -48,6 +53,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _progressPartText = string.Empty;
+
         public string ProgressPartText
         {
             get => _progressPartText;
@@ -55,6 +61,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progressPart;
+
         public double ProgressPart
         {
             get => _progressPart;
@@ -62,6 +69,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progress;
+
         public double Progress
         {
             get => _progress;
@@ -69,6 +77,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private ObservableCollection<FuseSimpleLog> _logItems = new();
+
         public ObservableCollection<FuseSimpleLog> LogItems
         {
             get => _logItems;
@@ -102,6 +111,11 @@ namespace nxDumpFuse.ViewModels
         private void StopDump()
         {
             _fuse?.StopFuse();
+        }
+
+        private void ClearLog()
+        {
+            LogItems.Clear();
         }
 
         private void OnFuseUpdate(FuseUpdateInfo fuseUpdateInfo)

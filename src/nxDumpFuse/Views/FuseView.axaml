@@ -37,25 +37,34 @@
             <Expander Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
                       Header="Log"
                       Margin="2">
-                <DataGrid
-                    x:Name="FuseSimpleLog"
-                    Items="{Binding LogItems}"
-                    CanUserSortColumns="False"
-                    CanUserResizeColumns="True"
-                    CanUserReorderColumns="True"
-                    VerticalScrollBarVisibility="Auto"
-                    HorizontalScrollBarVisibility="Auto"
-                    VerticalAlignment="Top"
-                    Height="300"
-                    LoadingRow="FuseSimpleLog_OnLoadingRow">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
-                                            Foreground="{Binding Color}" FontSize="12" />
-                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto" FontSize="12" />
-                        <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto" FontSize="12" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Expander>
+              <Grid>
+                  <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                  <DataGrid Grid.Column="0"
+                            x:Name="FuseSimpleLog"
+                            Items="{Binding LogItems}"
+                            CanUserSortColumns="False"
+                            CanUserResizeColumns="True"
+                            CanUserReorderColumns="True"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalAlignment="Top"
+                            Height="300"
+                            LoadingRow="FuseSimpleLog_OnLoadingRow">
+                      <DataGrid.Columns>
+                          <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
+                                              Foreground="{Binding Color}" FontSize="12" />
+                          <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto" FontSize="12" />
+                          <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto" FontSize="12" />
+                      </DataGrid.Columns>
+                  </DataGrid>
+                  <Button Grid.Column="1" Command="{Binding ClearLogCommand}" Content="Clear" HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Center" VerticalAlignment="Top" Margin="4" />
+                  </Grid>
+
+                </Expander>
         </Grid>
     </DockPanel>
 
