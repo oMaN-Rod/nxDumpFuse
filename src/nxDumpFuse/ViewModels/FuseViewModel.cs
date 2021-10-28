@@ -13,7 +13,6 @@ namespace nxDumpFuse.ViewModels
     public class FuseViewModel : ViewModelBase, IFuseViewModel
     {
         private readonly IDialogService _dialogService;
-        private readonly List<string> _extensions = new() { "*" };
         private Fuse? _fuse;
 
         public FuseViewModel(IDialogService dialogService)
@@ -78,7 +77,7 @@ namespace nxDumpFuse.ViewModels
 
         private async void SelectInputFile()
         {
-            InputFilePath = await _dialogService.ShowOpenFileDialogAsync("Choose Input File", new FileDialogFilter { Name = string.Empty, Extensions = _extensions });
+            InputFilePath = await _dialogService.ShowOpenFileDialogAsync("Choose Input File", new FileDialogFilter { Name = string.Empty, Extensions = new List<string>() });
         }
 
         private async void SelectOutputFolder()
