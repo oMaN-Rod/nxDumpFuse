@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ namespace nxDumpFuse.Model
         private readonly string _inputFilePath;
         private readonly string _outputDir;
         private string _outputFilePath = string.Empty;
+        private FileCase _fileCase;
 
         public Fuse(string inputFilePath, string outputDir)
         {
@@ -80,8 +82,8 @@ namespace nxDumpFuse.Model
                 Log(FuseSimpleLogType.Error, "No input files found");
                 return;
             }
-            inputFiles.Sort();
-            FuseFiles(inputFiles, _outputFilePath);
+            
+            FuseFiles(inputFiles);
         }
 
         private void GetOutputFilePath()
@@ -96,23 +98,30 @@ namespace nxDumpFuse.Model
                 if (int.TryParse(ext, out _) && split.Count >= 3 && split[^2] == XciExt) // .xci.00
                 {
                     _outputFilePath = Path.Join(_outputDir, $"{string.Join("", split.Take(split.Count - 2))}.{XciExt}");
+                    _fileCase = FileCase.XciNumeric;
                 }
                 else if (int.TryParse(ext, out _) && split.Count >= 3 && split[^2] == NspExt) // .nsp.00
+                {
                     _outputFilePath = Path.Join(_outputDir, $"{string.Join("", split.Take(split.Count - 2))}.{NspExt}");
+                    _fileCase = FileCase.NspNumeric;
+                }
                 else switch (ext[..2])
                 {
                     // .xc0
                     case "xc" when int.TryParse(ext.Substring(ext.Length - 1, 1), out _):
                         _outputFilePath = Path.Join(_outputDir, $"{Path.GetFileNameWithoutExtension(fileName)}.{XciExt}");
+                        _fileCase = FileCase.Xci;
                         break;
                     // .ns0
                     case "ns" when int.TryParse(ext.Substring(ext.Length - 1, 1), out _):
                         _outputFilePath = Path.Join(_outputDir, $"{Path.GetFileNameWithoutExtension(fileName)}.{NspExt}");
+                        _fileCase = FileCase.Nsp;
                         break;
                 }
             }
             else // dir/00
             {
+                _fileCase = FileCase.Numeric;
                 var inputDir = new FileInfo(_inputFilePath).Directory?.Name;
                 if (string.IsNullOrEmpty(inputDir))
                 {
@@ -128,16 +137,16 @@ namespace nxDumpFuse.Model
             }
         }
 
-        private async void FuseFiles(IReadOnlyCollection<string> inputFiles, string outputFilePath)
+        private async void FuseFiles(IReadOnlyCollection<string> inputFiles)
         {
             var buffer = new byte[1024 * 1024];
             var count = 0;
             long totalBytes = 0;
             var totalFileLength = GetTotalFileSize(inputFiles);
 
-            Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {outputFilePath}  ({ToMb(totalFileLength)}MB)");
+            Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {_outputFilePath}  ({ToMb(totalFileLength)}MB)");
             
-            await using var outputStream = File.Create(outputFilePath);
+            await using var outputStream = File.Create(_outputFilePath);
             foreach (var inputFilePath in inputFiles)
             {
                 if (_cts.Token.IsCancellationRequested) return;
@@ -189,8 +198,29 @@ namespace nxDumpFuse.Model
         private List<string> GetInputFiles()
         {
             var inputDir = Path.GetDirectoryName(_inputFilePath);
-            if (string.IsNullOrEmpty(inputDir)) inputDir = Path.GetPathRoot(_inputFilePath);
-            return inputDir != null ? Directory.GetFiles(inputDir, $"{Path.GetFileNameWithoutExtension(_inputFilePath)}*").ToList() : new List<string>();
+            if (string.IsNullOrEmpty(inputDir)) return new List<string>();
+            var files = new List<string>();
+            switch (_fileCase)
+            {
+                case FileCase.XciNumeric: // .xci.00
+                case FileCase.NspNumeric: // .nsp.00
+                    files = Directory.GetFiles(inputDir)
+                        .Where(f => int.TryParse(Path.GetExtension(f).Replace(".", ""), out _))
+                        .ToList();
+                    break;
+                case FileCase.Xci: // .xc0
+                case FileCase.Nsp: // .ns0
+                    files = Directory.GetFiles(inputDir, $"{Path.GetFileNameWithoutExtension(_inputFilePath)}*")
+                        .ToList();
+                    break;
+                case FileCase.Numeric: // dir/00
+                    files = Directory.GetFiles(inputDir)
+                        .Where(f => int.TryParse(Path.GetFileName(f), out _))
+                        .ToList();
+                    break;
+            }
+            files.Sort();
+            return files;
         }
 
         public void StopFuse()
