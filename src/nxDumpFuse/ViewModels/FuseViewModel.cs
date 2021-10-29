@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reactive;
 using Avalonia.Controls;
 using nxDumpFuse.Interfaces;
@@ -14,6 +15,8 @@ namespace nxDumpFuse.ViewModels
     {
         private readonly IDialogService _dialogService;
         private Fuse? _fuse;
+        private readonly Stopwatch _sw = new();
+        private TimeSpan _elapsed;
 
         public FuseViewModel(IDialogService dialogService)
         {
@@ -37,7 +40,6 @@ namespace nxDumpFuse.ViewModels
         public ReactiveCommand<Unit, Unit> StopCommand { get; }
 
         private string _inputFilePath = string.Empty;
-
         public string InputFilePath
         {
             get => _inputFilePath;
@@ -45,7 +47,6 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _outputDir = string.Empty;
-
         public string OutputDir
         {
             get => _outputDir;
@@ -53,7 +54,6 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _progressPartText = string.Empty;
-
         public string ProgressPartText
         {
             get => _progressPartText;
@@ -61,7 +61,6 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progressPart;
-
         public double ProgressPart
         {
             get => _progressPart;
@@ -69,15 +68,20 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progress;
-
         public double Progress
         {
             get => _progress;
             set => this.RaiseAndSetIfChanged(ref _progress, value);
         }
 
-        private ObservableCollection<FuseSimpleLog> _logItems = new();
+        private string _progressText = string.Empty;
+        public string ProgressText
+        {
+            get => _progressText;
+            set => this.RaiseAndSetIfChanged(ref _progressText, value);
+        }
 
+        private ObservableCollection<FuseSimpleLog> _logItems = new();
         public ObservableCollection<FuseSimpleLog> LogItems
         {
             get => _logItems;
@@ -99,18 +103,22 @@ namespace nxDumpFuse.ViewModels
             _fuse = new Fuse(InputFilePath, OutputDir);
             _fuse.FuseUpdateEvent += OnFuseUpdate;
             _fuse.FuseSimpleLogEvent += OnFuseSimpleLogEvent;
+            _sw.Start();
             try
             {
-                _fuse.FuseDump();
+                _fuse.Start();
             }
             catch (Exception e) {
+                _sw.Stop();
                 OnFuseSimpleLogEvent(new FuseSimpleLog(FuseSimpleLogType.Error, DateTime.Now, e.Message));
             }
         }
 
         private void StopDump()
         {
-            _fuse?.StopFuse();
+            _sw.Stop();
+            _fuse?.Stop();
+            ProgressText = string.Empty;
         }
 
         private void ClearLog()
@@ -120,9 +128,20 @@ namespace nxDumpFuse.ViewModels
 
         private void OnFuseUpdate(FuseUpdateInfo fuseUpdateInfo)
         {
+            if (fuseUpdateInfo.Complete)
+            {
+                _sw.Stop();
+                ProgressText = string.Empty;
+                return;
+            }
             ProgressPart = fuseUpdateInfo.ProgressPart;
-            Progress = fuseUpdateInfo.Progress;
             ProgressPartText = $"Part {fuseUpdateInfo.Part}/{fuseUpdateInfo.Parts}";
+            Progress = fuseUpdateInfo.Progress;
+
+            if (!(_sw.Elapsed.TotalSeconds >= 0.5 &&
+                  _sw.Elapsed.TotalSeconds - _elapsed.TotalSeconds >= 0.5)) return;
+            _elapsed = _sw.Elapsed;
+            ProgressText = $"({fuseUpdateInfo.Speed:0}MB/s) {Progress:0}% ";
         }
 
         private void OnFuseSimpleLogEvent(FuseSimpleLog log)

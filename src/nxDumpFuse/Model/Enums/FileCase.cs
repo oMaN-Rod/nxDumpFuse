@@ -2,6 +2,7 @@
 {
     public enum FileCase
     {
+        Invalid,
         XciNumeric, // .xci.00
         NspNumeric, // .nsp.00
         Xci, // .xc0

@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using nxDumpFuse.Events;
+using nxDumpFuse.Extensions;
 using nxDumpFuse.Model.Enums;
 
 namespace nxDumpFuse.Model
 {
     public class Fuse
     {
-        private const string XciExt = "xci";
-        private const string NspExt = "nsp";
+        
         private readonly CancellationTokenSource _cts;
         private readonly string _inputFilePath;
         private readonly string _outputDir;
         private string _outputFilePath = string.Empty;
         private FileCase _fileCase;
+        private readonly Stopwatch _sw = new();
 
         public Fuse(string inputFilePath, string outputDir)
         {
@@ -35,14 +35,16 @@ namespace nxDumpFuse.Model
             FuseUpdateEvent?.Invoke(fuseUpdateInfo);
         }
 
-        private void Update(int part, int parts, double progress, double progressPart)
+        private void Update(int part, int parts, double progress, double progressPart, long speed, bool complete = false)
         {
             OnFuseUpdate(new FuseUpdateInfo
             {
                 Part = part,
                 Parts = parts,
                 Progress = progress,
-                ProgressPart = progressPart
+                ProgressPart = progressPart,
+                Speed = speed.ToMb(),
+                Complete = complete
             });
         }
 
@@ -56,7 +58,7 @@ namespace nxDumpFuse.Model
             OnFuseSimpleLogEvent(new FuseSimpleLog(type, DateTime.Now, message));
         }
 
-        public void FuseDump()
+        public void Start()
         {
             if (string.IsNullOrEmpty(_inputFilePath))
             {
@@ -69,14 +71,14 @@ namespace nxDumpFuse.Model
                 return;
             }
             
-            GetOutputFilePath();
-            if (string.IsNullOrEmpty(_outputFilePath))
+            (_outputFilePath, _fileCase) = _inputFilePath.GetOutputFilePath(_outputDir);
+            if (string.IsNullOrEmpty(_outputFilePath) || _fileCase == FileCase.Invalid)
             {
                 Log(FuseSimpleLogType.Error, "Output path was null");
                 return;
             }
 
-            var inputFiles = GetInputFiles();
+            var inputFiles = _inputFilePath.GetInputFiles(_fileCase);
             if (inputFiles.Count == 0)
             {
                 Log(FuseSimpleLogType.Error, "No input files found");
@@ -86,77 +88,58 @@ namespace nxDumpFuse.Model
             FuseFiles(inputFiles);
         }
 
-        private void GetOutputFilePath()
+        public void Stop()
         {
-            
-            var fileName = Path.GetFileName(_inputFilePath);
-            if (Path.HasExtension(fileName))
-            {
-                var ext = Path.GetExtension(fileName).Replace(".", string.Empty);
-                var split = fileName.Split(".").ToList();
+            _cts.Cancel();
+            _sw.Stop();
 
-                if (int.TryParse(ext, out _) && split.Count >= 3 && split[^2] == XciExt) // .xci.00
-                {
-                    _outputFilePath = Path.Join(_outputDir, $"{string.Join("", split.Take(split.Count - 2))}.{XciExt}");
-                    _fileCase = FileCase.XciNumeric;
-                }
-                else if (int.TryParse(ext, out _) && split.Count >= 3 && split[^2] == NspExt) // .nsp.00
-                {
-                    _outputFilePath = Path.Join(_outputDir, $"{string.Join("", split.Take(split.Count - 2))}.{NspExt}");
-                    _fileCase = FileCase.NspNumeric;
-                }
-                else switch (ext[..2])
-                {
-                    // .xc0
-                    case "xc" when int.TryParse(ext.Substring(ext.Length - 1, 1), out _):
-                        _outputFilePath = Path.Join(_outputDir, $"{Path.GetFileNameWithoutExtension(fileName)}.{XciExt}");
-                        _fileCase = FileCase.Xci;
-                        break;
-                    // .ns0
-                    case "ns" when int.TryParse(ext.Substring(ext.Length - 1, 1), out _):
-                        _outputFilePath = Path.Join(_outputDir, $"{Path.GetFileNameWithoutExtension(fileName)}.{NspExt}");
-                        _fileCase = FileCase.Nsp;
-                        break;
-                }
-            }
-            else // dir/00
-            {
-                _fileCase = FileCase.Numeric;
-                var inputDir = new FileInfo(_inputFilePath).Directory?.Name;
-                if (string.IsNullOrEmpty(inputDir))
-                {
-                    inputDir = Path.GetPathRoot(_inputFilePath);
-                    _outputFilePath = $"{inputDir}.{NspExt}";
-                    return;
-                }
+            Log(FuseSimpleLogType.Information, "Fuse Stopped");
 
-                var inputDirSplit = inputDir.Split(".");
-                _outputFilePath = Path.Join(_outputDir, inputDirSplit.Length == 1 
-                    ? $"{inputDir}.{NspExt}" 
-                    : $"{string.Join("", (inputDirSplit).Take(inputDirSplit.Length - 1))}.{NspExt}");
+            if (File.Exists(_outputFilePath))
+            {
+                Task.Run((() =>
+                {
+                    const int retries = 5;
+                    for (var i = 0; i <= retries; i++)
+                    {
+                        try
+                        {
+                            File.Delete(_outputFilePath);
+                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => Log(FuseSimpleLogType.Information, $"Deleted {_outputFilePath}"));
+                            Update(0, 0, 0, 0, 0);
+                            break;
+                        }
+                        catch (IOException)
+                        {
+                            Thread.Sleep(1000);
+                        }
+                    }
+                }));
             }
         }
 
-        private async void FuseFiles(IReadOnlyCollection<string> inputFiles)
+        private async void FuseFiles(List<string> inputFiles)
         {
             var buffer = new byte[1024 * 1024];
             var count = 0;
             long totalBytes = 0;
-            var totalFileLength = GetTotalFileSize(inputFiles);
+            var totalFileLength = inputFiles.GetOutputFileSize();
 
-            Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {_outputFilePath}  ({ToMb(totalFileLength)}MB)");
-            
+            Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {_outputFilePath}  ({totalFileLength.ToMb()}MB)");
+
+            _sw.Start();
             await using var outputStream = File.Create(_outputFilePath);
             foreach (var inputFilePath in inputFiles)
             {
                 if (_cts.Token.IsCancellationRequested) return;
                 long currentBytes = 0;
                 int currentBlockSize;
+                long copySpeed = 0;
 
                 await using var inputStream = File.OpenRead(inputFilePath);
                 var fileLength = inputStream.Length;
 
-                Log(FuseSimpleLogType.Information, $"Fusing file part {++count}-> {inputFilePath} ({ToMb(fileLength)}MB)");
+                Log(FuseSimpleLogType.Information, $"Fusing file part {++count}-> {inputFilePath} ({fileLength.ToMb()}MB)");
 
                 while ((currentBlockSize = inputStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
@@ -172,84 +155,21 @@ namespace nxDumpFuse.Model
                     catch (TaskCanceledException e)
                     {
                         Log(FuseSimpleLogType.Error, e.Message);
+                        _sw.Stop();
+                        Update(0,0,0,0,0,true);
+                        return;
                     }
 
                     var progress = totalBytes * 100.0 / totalFileLength;
                     var progressPart = currentBytes * 100.0 / fileLength;
-                    Update(count, inputFiles.Count, progress, progressPart);
+                    if(_sw.ElapsedMilliseconds >= 1000) copySpeed = totalBytes / _sw.ElapsedMilliseconds.ToSeconds();
+                    Update(count, inputFiles.Count, progress, progressPart, copySpeed);
                 }
             }
-
-            Log(FuseSimpleLogType.Information, "Fuse Complete");
-        }
-
-        private static long ToMb(long bytes)
-        {
-            return bytes / 1000000;
-        }
-
-        private static long GetTotalFileSize(IEnumerable<string> inputFiles)
-        {
-            long totalFileSize = 0;
-            inputFiles.Select(f => f).ToList().ForEach(f => totalFileSize += new FileInfo(f).Length);
-            return totalFileSize;
-        }
-
-        private List<string> GetInputFiles()
-        {
-            var inputDir = Path.GetDirectoryName(_inputFilePath);
-            if (string.IsNullOrEmpty(inputDir)) return new List<string>();
-            var files = new List<string>();
-            switch (_fileCase)
-            {
-                case FileCase.XciNumeric: // .xci.00
-                case FileCase.NspNumeric: // .nsp.00
-                    files = Directory.GetFiles(inputDir)
-                        .Where(f => int.TryParse(Path.GetExtension(f).Replace(".", ""), out _))
-                        .ToList();
-                    break;
-                case FileCase.Xci: // .xc0
-                case FileCase.Nsp: // .ns0
-                    files = Directory.GetFiles(inputDir, $"{Path.GetFileNameWithoutExtension(_inputFilePath)}*")
-                        .ToList();
-                    break;
-                case FileCase.Numeric: // dir/00
-                    files = Directory.GetFiles(inputDir)
-                        .Where(f => int.TryParse(Path.GetFileName(f), out _))
-                        .ToList();
-                    break;
-            }
-            files.Sort();
-            return files;
-        }
-
-        public void StopFuse()
-        {
-            _cts.Cancel();
-
-            Log(FuseSimpleLogType.Information, "Fuse Stopped");
-
-            if (File.Exists(_outputFilePath))
-            {
-                Task.Run((() =>
-                {
-                    const int retries = 5;
-                    for (var i = 0; i <= retries; i++)
-                    {
-                        try
-                        {
-                            File.Delete(_outputFilePath);
-                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => Log(FuseSimpleLogType.Information, $"Deleted {_outputFilePath}"));
-                            Update(0, 0, 0, 0);
-                            break;
-                        }
-                        catch (IOException)
-                        {
-                            Thread.Sleep(1000);
-                        }
-                    }
-                }));
-            }
+            
+            Log(FuseSimpleLogType.Information, $"Fuse Completed in {_sw.ElapsedMilliseconds.ToSeconds()}s");
+            _sw.Stop();
+            Update(0, 0, 0, 0, 0, true);
         }
     }
 }
