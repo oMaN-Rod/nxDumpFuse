@@ -40,12 +40,4 @@
       <DependentUpon>FuseView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <None Update="Launchers\Linux\nxDumpFuse.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Launchers\Linux\Ubuntu\Run Executable.desktop">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
