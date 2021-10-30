@@ -10,9 +10,8 @@
           RowDefinitions="Auto,Auto"
           ColumnDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Text="{Binding UsageText}" />
-        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="{Binding AuthorInfo}"
-                   HorizontalAlignment="Right" />
-        <Button Grid.Row="1" Grid.Column="1" Padding="-10" Command="{Binding OpenGithubCommand}">
+        <TextBlock Grid.Row="1" Grid.Column="0"  Text="{Binding AuthorInfo}" Classes="authorInfo" />
+        <Button Grid.Row="1" Grid.Column="1" Command="{Binding OpenGithubCommand}" Classes="gitHubButton">
             <Panel>
                 <Image Width="75" Height="75" Source="resm:nxDumpFuse.Assets.github_icon.png" />
             </Panel>

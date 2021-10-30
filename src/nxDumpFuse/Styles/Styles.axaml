@@ -1,0 +1,68 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--TextBlock-->
+    <Style Selector="TextBlock.inlineProgress">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+
+    <Style Selector="TextBlock.authorInfo">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <Style Selector="TextBlock.footerProgress">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Margin" Value="0 0 20 0" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!--TextBox-->
+    <Style Selector="TextBox">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="5" />
+    </Style>
+
+    <!--DataGrid-->
+    <Style Selector="DataGrid">
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Height" Value="300" />
+    </Style>
+
+    <Style Selector="DataGridCell.logCell">
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!--ProgressBar-->
+    <Style Selector="ProgressBar">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Height" Value="10" />
+    </Style>
+
+    <!--Button-->
+    <Style Selector="Button">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+
+    <Style Selector="Button.clear">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4 0 0 0" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <Style Selector="Button.gitHubButton">
+        <Setter Property="Padding" Value="-10" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+</Styles>

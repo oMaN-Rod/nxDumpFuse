@@ -11,66 +11,52 @@
               RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
               ColumnDefinitions="Auto,*,50">
 
-            <Button Grid.Row="0" Grid.Column="0" Command="{Binding SelectInputFileCommand}" Content="Input"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" VerticalAlignment="Center"
-                     Text="{Binding InputFilePath}"
-                     Name="InputFileTextBox" />
+            <Button Grid.Row="0" Grid.Column="0" Command="{Binding SelectInputFileCommand}" Content="Input" />
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding InputFilePath}" />
 
-            <Button Grid.Row="1" Grid.Column="0" Command="{Binding SelectOutputFolderCommand}" Content="Output"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" VerticalAlignment="Center"
-                     Text="{Binding OutputDir}" />
+            <Button Grid.Row="1" Grid.Column="0" Command="{Binding SelectOutputFolderCommand}" Content="Output" />
+            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding OutputDir}" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ProgressPartText}" HorizontalAlignment="Right"
-                       Margin="2" />
-            <ProgressBar Grid.Row="2" Grid.Column="1"  Grid.ColumnSpan="2" Margin="2" Height="10" Value="{Binding ProgressPart}" HorizontalAlignment="Stretch"/>
-            
-            
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding ProgressPartText}" />
+            <ProgressBar Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding ProgressPart}" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Total" HorizontalAlignment="Right" Margin="2" />
-            <ProgressBar Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="2" Margin="2" Height="10" Value="{Binding Progress}" HorizontalAlignment="Stretch"/>
-            
 
-            <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding FuseCommand}" Content="Fuse" HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center" Margin="2" />
-                <Button Command="{Binding StopCommand}" Content="Stop" HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center" Margin="2" />
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Total" Classes="inlineProgress" />
+            <ProgressBar Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding Progress}" />
+
+
+            <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Command="{Binding FuseCommand}" Content="Fuse" />
+                <Button Command="{Binding StopCommand}" Content="Stop" />
             </StackPanel>
 
             <Expander Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
                       Header="Log"
                       Margin="2">
-                <Grid ColumnDefinitions="*,Auto" >
+                <Grid ColumnDefinitions="*,Auto">
                     <DataGrid Grid.Column="0"
                               x:Name="FuseSimpleLog"
                               Items="{Binding LogItems}"
                               CanUserSortColumns="False"
                               CanUserResizeColumns="True"
                               CanUserReorderColumns="True"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalAlignment="Top"
-                              Height="300"
                               LoadingRow="FuseSimpleLog_OnLoadingRow">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto"
-                                                Foreground="{Binding Color}" FontSize="12" />
-                            <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="Auto" FontSize="12" />
-                            <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="Auto" FontSize="12" />
+                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Foreground="{Binding Color}"
+                                                CellStyleClasses="logCell" />
+                            <DataGridTextColumn Header="Time" Binding="{Binding Time}" CellStyleClasses="logCell" />
+                            <DataGridTextColumn Header="Message" Binding="{Binding Message}" CellStyleClasses="logCell" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Column="1" Command="{Binding ClearLogCommand}" Content="Clear"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Center" VerticalAlignment="Top" Margin="4 0 0 0" />
+                    <Button Grid.Column="1" Command="{Binding ClearLogCommand}" Content="Clear" Classes="clear" />
                 </Grid>
 
             </Expander>
-            
+
         </Grid>
 
-        <TextBlock DockPanel.Dock="Bottom" Text="{Binding ProgressText}" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12" Margin="0 0 20 0"/>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding ProgressText}" Classes="footerProgress" />
     </DockPanel>
 
 </UserControl>

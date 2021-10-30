@@ -9,6 +9,7 @@
     <Application.Styles>
         <FluentTheme Mode="Dark" />
         <StyleInclude Source="/Styles/SideBar.axaml" />
+        <StyleInclude Source="/Styles/Styles.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     </Application.Styles>
 </Application>
