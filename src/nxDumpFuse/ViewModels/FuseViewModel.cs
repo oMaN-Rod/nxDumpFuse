@@ -23,12 +23,24 @@ namespace nxDumpFuse.ViewModels
         {
             _dialogService = dialogService;
             _fuseService = fuseServiceService;
+            _fuseService.FuseUpdateEvent += OnFuseServiceUpdate;
+            _fuseService.FuseSimpleLogEvent += OnFuseServiceSimpleLogEvent;
 
             SelectInputFileCommand = ReactiveCommand.Create(SelectInputFile);
             SelectOutputFolderCommand = ReactiveCommand.Create(SelectOutputFolder);
-            FuseCommand = ReactiveCommand.Create(FuseNxDump);
-            StopCommand = ReactiveCommand.Create(StopDump);
             ClearLogCommand = ReactiveCommand.Create(ClearLog);
+
+
+            var canFuse = this.WhenAnyValue(vm => vm.InputFilePath, vm => vm.OutputDir, vm => vm.IsBusy,
+                (input, output, isBusy) => !string.IsNullOrWhiteSpace(input) &&
+                                           !string.IsNullOrWhiteSpace(output) &&
+                                           !isBusy);
+
+            var canStop = this.WhenAnyValue(vm => vm.IsBusy);
+
+            StartCommand = ReactiveCommand.Create(StartFuse, canFuse);
+            StopCommand = ReactiveCommand.Create(StopFuse, canStop);
+
             ProgressPartText = "Part 0/0";
         }
 
@@ -38,9 +50,16 @@ namespace nxDumpFuse.ViewModels
 
         public ReactiveCommand<Unit, Unit> ClearLogCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> FuseCommand { get; }
+        public ReactiveCommand<Unit, Unit> StartCommand { get; }
 
         public ReactiveCommand<Unit, Unit> StopCommand { get; }
+
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set => this.RaiseAndSetIfChanged(ref _isBusy, value);
+        }
 
         private string _inputFilePath = string.Empty;
         public string InputFilePath
@@ -88,44 +107,17 @@ namespace nxDumpFuse.ViewModels
         public ObservableCollection<FuseSimpleLog> LogItems
         {
             get => _logItems;
-            set => this.RaiseAndSetIfChanged( ref _logItems, value);
-        }
-
-        private async void SelectInputFile()
-        {
-            InputFilePath = await _dialogService.ShowOpenFileDialogAsync("Choose Input File", new FileDialogFilter { Name = string.Empty, Extensions = new List<string>() });
-        }
-
-        private async void SelectOutputFolder()
-        {
-            OutputDir = await _dialogService.ShowOpenFolderDialogAsync("Choose Output Folder");
-        }
-
-        private void FuseNxDump()
-        {
-            _fuseService.FuseUpdateEvent += OnFuseServiceUpdate;
-            _fuseService.FuseSimpleLogEvent += OnFuseServiceSimpleLogEvent;
-            _sw.Start();
-            try
-            {
-                _fuseService.Start(InputFilePath, OutputDir);
-            }
-            catch (Exception e) {
-                _sw.Stop();
-                OnFuseServiceSimpleLogEvent(new FuseSimpleLog(FuseSimpleLogType.Error, DateTime.Now, e.Message));
-            }
-        }
-
-        private void StopDump()
-        {
-            _sw.Stop();
-            _fuseService?.Stop();
-            ProgressText = string.Empty;
+            set => this.RaiseAndSetIfChanged(ref _logItems, value);
         }
 
         private void ClearLog()
         {
             LogItems.Clear();
+        }
+
+        private void OnFuseServiceSimpleLogEvent(FuseSimpleLog log)
+        {
+            LogItems.Add(log);
         }
 
         private void OnFuseServiceUpdate(FuseUpdateInfo fuseUpdateInfo)
@@ -134,8 +126,10 @@ namespace nxDumpFuse.ViewModels
             {
                 _sw.Stop();
                 ProgressText = string.Empty;
+                IsBusy = false;
                 return;
             }
+
             ProgressPart = fuseUpdateInfo.ProgressPart;
             ProgressPartText = $"Part {fuseUpdateInfo.Part}/{fuseUpdateInfo.Parts}";
             Progress = fuseUpdateInfo.Progress;
@@ -146,9 +140,38 @@ namespace nxDumpFuse.ViewModels
             ProgressText = $"({fuseUpdateInfo.Speed:0}MB/s) {Progress:0}% ";
         }
 
-        private void OnFuseServiceSimpleLogEvent(FuseSimpleLog log)
+        private async void SelectInputFile()
         {
-            LogItems.Add(log);
+            InputFilePath = await _dialogService.ShowOpenFileDialogAsync("Choose Input File",
+                new FileDialogFilter { Name = string.Empty, Extensions = new List<string>() });
+        }
+
+        private async void SelectOutputFolder()
+        {
+            OutputDir = await _dialogService.ShowOpenFolderDialogAsync("Choose Output Folder");
+        }
+
+        private void StartFuse()
+        {
+            IsBusy = true;
+            _sw.Start();
+            try
+            {
+                _fuseService.Start(InputFilePath, OutputDir);
+            }
+            catch (Exception e)
+            {
+                _sw.Stop();
+                OnFuseServiceSimpleLogEvent(new FuseSimpleLog(FuseSimpleLogType.Error, DateTime.Now, e.Message));
+            }
+        }
+
+        private void StopFuse()
+        {
+            _sw.Stop();
+            _fuseService.Stop();
+            ProgressText = string.Empty;
+            IsBusy = false;
         }
     }
 }

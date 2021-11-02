@@ -27,7 +27,7 @@
 
             <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Command="{Binding FuseCommand}" Content="Fuse" />
+                <Button Command="{Binding StartCommand}" Content="Fuse" />
                 <Button Command="{Binding StopCommand}" Content="Stop" />
             </StackPanel>
 

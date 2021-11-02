@@ -15,10 +15,7 @@ namespace nxDumpFuse.Services
     {
         
         private CancellationTokenSource? _cts;
-        private string? _inputFilePath;
-        private string? _outputDir;
         private string? _outputFilePath;
-        private FileCase _fileCase;
         private readonly Stopwatch _sw = new();
 
         public event EventHandlers.FuseUpdateEventHandler? FuseUpdateEvent;
@@ -54,29 +51,28 @@ namespace nxDumpFuse.Services
 
         public void Start(string inputFilePath, string outputDir)
         {
-            _inputFilePath = inputFilePath;
-            _outputDir = outputDir;
             _cts = new CancellationTokenSource();
 
-            if (string.IsNullOrEmpty(_inputFilePath))
+            if (string.IsNullOrEmpty(inputFilePath))
             {
                 Log(FuseSimpleLogType.Error, "Input File cannot be empty");
                 return;
             }
-            if (string.IsNullOrEmpty(_outputDir))
+            if (string.IsNullOrEmpty(outputDir))
             {
                 Log(FuseSimpleLogType.Error, "Output Directory cannot be empty");
                 return;
             }
-            
-            (_outputFilePath, _fileCase) = _inputFilePath.GetOutputFilePath(_outputDir);
-            if (string.IsNullOrEmpty(_outputFilePath) || _fileCase == FileCase.Invalid)
+
+            FileCase fileCase;
+            (_outputFilePath, fileCase) = inputFilePath.GetOutputFilePath(outputDir);
+            if (string.IsNullOrEmpty(_outputFilePath) || fileCase == FileCase.Invalid)
             {
                 Log(FuseSimpleLogType.Error, "Output path was null");
                 return;
             }
 
-            var inputFiles = _inputFilePath.GetInputFiles(_fileCase);
+            var inputFiles = inputFilePath.GetInputFiles(fileCase);
             if (inputFiles.Count == 0)
             {
                 Log(FuseSimpleLogType.Error, "No input files found");
@@ -88,12 +84,12 @@ namespace nxDumpFuse.Services
 
         public void Stop()
         {
-            _cts.Cancel();
+            _cts?.Cancel();
             _sw.Stop();
 
             Log(FuseSimpleLogType.Information, "Fuse Stopped");
 
-            if (File.Exists(_outputFilePath))
+            if (!string.IsNullOrEmpty(_outputFilePath) && File.Exists(_outputFilePath))
             {
                 Task.Run((() =>
                 {
@@ -126,10 +122,10 @@ namespace nxDumpFuse.Services
             Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {_outputFilePath}  ({totalFileLength.ToMb()}MB)");
 
             _sw.Start();
-            await using var outputStream = File.Create(_outputFilePath);
+            await using var outputStream = File.Create(_outputFilePath!);
             foreach (var inputFilePath in inputFiles)
             {
-                if (_cts.Token.IsCancellationRequested) return;
+                if (_cts!.Token.IsCancellationRequested) return;
                 long currentBytes = 0;
                 int currentBlockSize;
                 long copySpeed = 0;
