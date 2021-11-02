@@ -122,48 +122,59 @@ namespace nxDumpFuse.Services
             Log(FuseSimpleLogType.Information, $"Fusing {inputFiles.Count} parts to {_outputFilePath}  ({totalFileLength.ToMb()}MB)");
 
             _sw.Start();
-            await using var outputStream = File.Create(_outputFilePath!);
-            foreach (var inputFilePath in inputFiles)
+            try
             {
-                if (_cts!.Token.IsCancellationRequested) return;
-                long currentBytes = 0;
-                int currentBlockSize;
-                long copySpeed = 0;
-
-                await using var inputStream = File.OpenRead(inputFilePath);
-                var fileLength = inputStream.Length;
-
-                Log(FuseSimpleLogType.Information, $"Fusing file part {++count}-> {inputFilePath} ({fileLength.ToMb()}MB)");
-
-                while ((currentBlockSize = inputStream.Read(buffer, 0, buffer.Length)) > 0)
+                await using var outputStream = File.Create(_outputFilePath!);
+                foreach (var inputFilePath in inputFiles)
                 {
-                    if (_cts.Token.IsCancellationRequested) return;
+                    if (_cts!.Token.IsCancellationRequested) return;
+                    long currentBytes = 0;
+                    int currentBlockSize;
+                    long copySpeed = 0;
 
-                    currentBytes += currentBlockSize;
-                    totalBytes += currentBlockSize;
+                    await using var inputStream = File.OpenRead(inputFilePath);
+                    var fileLength = inputStream.Length;
 
-                    try
+                    Log(FuseSimpleLogType.Information,
+                        $"Fusing file part {++count}-> {inputFilePath} ({fileLength.ToMb()}MB)");
+
+                    while ((currentBlockSize = inputStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        await outputStream.WriteAsync(buffer, 0, currentBlockSize, _cts.Token);
-                    }
-                    catch (TaskCanceledException e)
-                    {
-                        Log(FuseSimpleLogType.Error, e.Message);
-                        _sw.Stop();
-                        Update(0,0,0,0,0,true);
-                        return;
-                    }
+                        if (_cts.Token.IsCancellationRequested) return;
 
-                    var progress = totalBytes * 100.0 / totalFileLength;
-                    var progressPart = currentBytes * 100.0 / fileLength;
-                    if(_sw.ElapsedMilliseconds >= 1000) copySpeed = totalBytes / _sw.ElapsedMilliseconds.ToSeconds();
-                    Update(count, inputFiles.Count, progress, progressPart, copySpeed);
+                        currentBytes += currentBlockSize;
+                        totalBytes += currentBlockSize;
+
+                        try
+                        {
+                            await outputStream.WriteAsync(buffer, 0, currentBlockSize, _cts.Token);
+                        }
+                        catch (TaskCanceledException e)
+                        {
+                            Log(FuseSimpleLogType.Error, e.Message);
+                            _sw.Stop();
+                            Update(0, 0, 0, 0, 0, true);
+                            return;
+                        }
+
+                        var progress = totalBytes * 100.0 / totalFileLength;
+                        var progressPart = currentBytes * 100.0 / fileLength;
+                        if (_sw.ElapsedMilliseconds >= 1000)
+                            copySpeed = totalBytes / _sw.ElapsedMilliseconds.ToSeconds();
+                        Update(count, inputFiles.Count, progress, progressPart, copySpeed);
+                    }
                 }
+
+                Log(FuseSimpleLogType.Information, $"Fuse Completed in {_sw.ElapsedMilliseconds.ToSeconds()}s");
+                _sw.Stop();
+                Update(0, 0, 0, 0, 0, true);
             }
-            
-            Log(FuseSimpleLogType.Information, $"Fuse Completed in {_sw.ElapsedMilliseconds.ToSeconds()}s");
-            _sw.Stop();
-            Update(0, 0, 0, 0, 0, true);
+            catch (Exception e)
+            {
+                Log(FuseSimpleLogType.Error, e.Message);
+                _sw.Stop();
+                Update(0, 0, 0, 0, 0, true);
+            }
         }
     }
 }
