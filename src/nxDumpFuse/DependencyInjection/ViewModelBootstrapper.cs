@@ -1,6 +1,7 @@
 ﻿using nxDumpFuse.Extensions;
-using nxDumpFuse.Interfaces;
+using nxDumpFuse.Services;
 using nxDumpFuse.ViewModels;
+using nxDumpFuse.ViewModels.Interfaces;
 using Splat;
 
 namespace nxDumpFuse.DependencyInjection
@@ -15,7 +16,8 @@ namespace nxDumpFuse.DependencyInjection
             ));
 
             services.RegisterLazySingleton<IFuseViewModel>(() => new FuseViewModel(
-                resolver.GetRequiredService<IDialogService>()));
+                resolver.GetRequiredService<IDialogService>(),
+                resolver.GetRequiredService<IFuseService>()));
             services.RegisterLazySingleton<IAboutViewModel>(() => new AboutViewModel());
         }
     }

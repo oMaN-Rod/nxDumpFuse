@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using nxDumpFuse.Extensions;
-using nxDumpFuse.Interfaces;
 using nxDumpFuse.ViewModels;
+using nxDumpFuse.ViewModels.Interfaces;
 using nxDumpFuse.Views;
 using Splat;
 

@@ -2,7 +2,7 @@
 using System.Reactive;
 using System.Runtime.InteropServices;
 using System.Text;
-using nxDumpFuse.Interfaces;
+using nxDumpFuse.ViewModels.Interfaces;
 using ReactiveUI;
 
 namespace nxDumpFuse.ViewModels

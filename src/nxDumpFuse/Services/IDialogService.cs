@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls;
 
-namespace nxDumpFuse.Interfaces
+namespace nxDumpFuse.Services
 {
     public interface IDialogService
     {

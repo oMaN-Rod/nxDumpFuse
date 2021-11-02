@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace nxDumpFuse.Interfaces
+namespace nxDumpFuse.ViewModels.Interfaces
 {
     public interface IMainWindowProvider
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls;
-using nxDumpFuse.Interfaces;
+using nxDumpFuse.ViewModels.Interfaces;
 
 namespace nxDumpFuse.Services
 {

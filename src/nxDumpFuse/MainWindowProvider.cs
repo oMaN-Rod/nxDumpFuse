@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using nxDumpFuse.Interfaces;
+using nxDumpFuse.ViewModels.Interfaces;
 
 namespace nxDumpFuse
 {

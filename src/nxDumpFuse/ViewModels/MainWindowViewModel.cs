@@ -1,5 +1,4 @@
-
-using nxDumpFuse.Interfaces;
+using nxDumpFuse.ViewModels.Interfaces;
 
 namespace nxDumpFuse.ViewModels
 {

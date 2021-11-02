@@ -4,9 +4,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reactive;
 using Avalonia.Controls;
-using nxDumpFuse.Interfaces;
 using nxDumpFuse.Model;
 using nxDumpFuse.Model.Enums;
+using nxDumpFuse.Services;
+using nxDumpFuse.ViewModels.Interfaces;
 using ReactiveUI;
 
 namespace nxDumpFuse.ViewModels
@@ -14,13 +15,15 @@ namespace nxDumpFuse.ViewModels
     public class FuseViewModel : ViewModelBase, IFuseViewModel
     {
         private readonly IDialogService _dialogService;
-        private Fuse? _fuse;
+        private readonly IFuseService _fuseService;
         private readonly Stopwatch _sw = new();
         private TimeSpan _elapsed;
 
-        public FuseViewModel(IDialogService dialogService)
+        public FuseViewModel(IDialogService dialogService, IFuseService fuseServiceService)
         {
             _dialogService = dialogService;
+            _fuseService = fuseServiceService;
+
             SelectInputFileCommand = ReactiveCommand.Create(SelectInputFile);
             SelectOutputFolderCommand = ReactiveCommand.Create(SelectOutputFolder);
             FuseCommand = ReactiveCommand.Create(FuseNxDump);
@@ -100,24 +103,23 @@ namespace nxDumpFuse.ViewModels
 
         private void FuseNxDump()
         {
-            _fuse = new Fuse(InputFilePath, OutputDir);
-            _fuse.FuseUpdateEvent += OnFuseUpdate;
-            _fuse.FuseSimpleLogEvent += OnFuseSimpleLogEvent;
+            _fuseService.FuseUpdateEvent += OnFuseServiceUpdate;
+            _fuseService.FuseSimpleLogEvent += OnFuseServiceSimpleLogEvent;
             _sw.Start();
             try
             {
-                _fuse.Start();
+                _fuseService.Start(InputFilePath, OutputDir);
             }
             catch (Exception e) {
                 _sw.Stop();
-                OnFuseSimpleLogEvent(new FuseSimpleLog(FuseSimpleLogType.Error, DateTime.Now, e.Message));
+                OnFuseServiceSimpleLogEvent(new FuseSimpleLog(FuseSimpleLogType.Error, DateTime.Now, e.Message));
             }
         }
 
         private void StopDump()
         {
             _sw.Stop();
-            _fuse?.Stop();
+            _fuseService?.Stop();
             ProgressText = string.Empty;
         }
 
@@ -126,7 +128,7 @@ namespace nxDumpFuse.ViewModels
             LogItems.Clear();
         }
 
-        private void OnFuseUpdate(FuseUpdateInfo fuseUpdateInfo)
+        private void OnFuseServiceUpdate(FuseUpdateInfo fuseUpdateInfo)
         {
             if (fuseUpdateInfo.Complete)
             {
@@ -144,7 +146,7 @@ namespace nxDumpFuse.ViewModels
             ProgressText = $"({fuseUpdateInfo.Speed:0}MB/s) {Progress:0}% ";
         }
 
-        private void OnFuseSimpleLogEvent(FuseSimpleLog log)
+        private void OnFuseServiceSimpleLogEvent(FuseSimpleLog log)
         {
             LogItems.Add(log);
         }

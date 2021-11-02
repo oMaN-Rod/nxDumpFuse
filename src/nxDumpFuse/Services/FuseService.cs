@@ -6,26 +6,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using nxDumpFuse.Events;
 using nxDumpFuse.Extensions;
+using nxDumpFuse.Model;
 using nxDumpFuse.Model.Enums;
 
-namespace nxDumpFuse.Model
+namespace nxDumpFuse.Services
 {
-    public class Fuse
+    public class FuseService : IFuseService
     {
         
-        private readonly CancellationTokenSource _cts;
-        private readonly string _inputFilePath;
-        private readonly string _outputDir;
-        private string _outputFilePath = string.Empty;
+        private CancellationTokenSource? _cts;
+        private string? _inputFilePath;
+        private string? _outputDir;
+        private string? _outputFilePath;
         private FileCase _fileCase;
         private readonly Stopwatch _sw = new();
-
-        public Fuse(string inputFilePath, string outputDir)
-        {
-            _inputFilePath = inputFilePath;
-            _outputDir = outputDir;
-            _cts = new CancellationTokenSource();
-        }
 
         public event EventHandlers.FuseUpdateEventHandler? FuseUpdateEvent;
         public event EventHandlers.FuseSimpleLogEventHandler? FuseSimpleLogEvent;
@@ -58,8 +52,12 @@ namespace nxDumpFuse.Model
             OnFuseSimpleLogEvent(new FuseSimpleLog(type, DateTime.Now, message));
         }
 
-        public void Start()
+        public void Start(string inputFilePath, string outputDir)
         {
+            _inputFilePath = inputFilePath;
+            _outputDir = outputDir;
+            _cts = new CancellationTokenSource();
+
             if (string.IsNullOrEmpty(_inputFilePath))
             {
                 Log(FuseSimpleLogType.Error, "Input File cannot be empty");
@@ -118,7 +116,7 @@ namespace nxDumpFuse.Model
             }
         }
 
-        private async void FuseFiles(List<string> inputFiles)
+        public async void FuseFiles(List<string> inputFiles)
         {
             var buffer = new byte[1024 * 1024];
             var count = 0;
