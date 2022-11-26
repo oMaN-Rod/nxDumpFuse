@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using nxDumpFuse.ViewModels.Interfaces;
 
@@ -15,14 +16,18 @@ namespace nxDumpFuse.Services
 
         public async Task<string> ShowOpenFileDialogAsync(string title, FileDialogFilter filter)
         {
-            var openFileDialog = new OpenFileDialog()
+            var openFileDialog = new OpenFileDialog
             {
                 Title = title,
                 AllowMultiple = false
             };
-            openFileDialog.Filters.Add(filter);
+            openFileDialog.Filters!.Add(filter);
 
             var result = await openFileDialog.ShowAsync(_mainWindowProvider.GetMainWindow());
+            if (result == null)
+            {
+                return string.Empty;
+            }
             return result.Length == 0 ? string.Empty : result[0];
         }
 
@@ -32,7 +37,8 @@ namespace nxDumpFuse.Services
             {
                 Title = title
             };
-            return await openFolderDialog.ShowAsync(_mainWindowProvider.GetMainWindow());
+            var result = await openFolderDialog.ShowAsync(_mainWindowProvider.GetMainWindow());
+            return result ?? string.Empty;
         }
     }
 }

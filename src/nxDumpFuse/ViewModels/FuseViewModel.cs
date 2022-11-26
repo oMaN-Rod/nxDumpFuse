@@ -55,6 +55,7 @@ namespace nxDumpFuse.ViewModels
         public ReactiveCommand<Unit, Unit> StopCommand { get; }
 
         private bool _isBusy;
+
         public bool IsBusy
         {
             get => _isBusy;
@@ -62,6 +63,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _inputFilePath = string.Empty;
+
         public string InputFilePath
         {
             get => _inputFilePath;
@@ -69,6 +71,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _outputDir = string.Empty;
+
         public string OutputDir
         {
             get => _outputDir;
@@ -76,6 +79,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _progressPartText = string.Empty;
+
         public string ProgressPartText
         {
             get => _progressPartText;
@@ -83,6 +87,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progressPart;
+
         public double ProgressPart
         {
             get => _progressPart;
@@ -90,6 +95,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private double _progress;
+
         public double Progress
         {
             get => _progress;
@@ -97,6 +103,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private string _progressText = string.Empty;
+
         public string ProgressText
         {
             get => _progressText;
@@ -104,6 +111,7 @@ namespace nxDumpFuse.ViewModels
         }
 
         private ObservableCollection<FuseSimpleLog> _logItems = new();
+
         public ObservableCollection<FuseSimpleLog> LogItems
         {
             get => _logItems;
@@ -143,7 +151,7 @@ namespace nxDumpFuse.ViewModels
         private async void SelectInputFile()
         {
             InputFilePath = await _dialogService.ShowOpenFileDialogAsync("Choose Input File",
-                new FileDialogFilter { Name = string.Empty, Extensions = new List<string>() });
+                new FileDialogFilter { Name = string.Empty, Extensions = new List<string> { "*" } });
         }
 
         private async void SelectOutputFolder()

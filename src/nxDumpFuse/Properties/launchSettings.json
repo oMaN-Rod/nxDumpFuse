@@ -3,6 +3,10 @@
     "nxDumpFuse": {
       "commandName": "Project",
       "commandLineArgs": "/l Trace"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
     }
   }
 }
