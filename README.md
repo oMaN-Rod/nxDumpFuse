@@ -23,6 +23,16 @@ Instructions on how to use this tool can be found [here](https://yuzu-emu.org/he
 
 If you run into issues running on Ubuntu try [this](https://github.com/oMaN-Rod/nxDumpFuse/wiki/Launching).
 
+If you are receiving a libssl error similar to the following you will need to manually install the package, refer to these issues for guidance
+
+```
+No usable version of libssl was found
+Aborted (core dumped)
+```
+
+[Linux Support](https://github.com/oMaN-Rod/nxDumpFuse/issues/1)
+[No usable version of libssl was found](https://github.com/oMaN-Rod/nxDumpFuse/issues/2)
+
 ## Screenshots
 
 ### Windows
