@@ -30,8 +30,8 @@ No usable version of libssl was found
 Aborted (core dumped)
 ```
 
-[Linux Support](https://github.com/oMaN-Rod/nxDumpFuse/issues/1)
-[No usable version of libssl was found](https://github.com/oMaN-Rod/nxDumpFuse/issues/2)
+- [Linux Support](https://github.com/oMaN-Rod/nxDumpFuse/issues/4)
+- [No usable version of libssl was found](https://github.com/oMaN-Rod/nxDumpFuse/issues/2)
 
 ## Screenshots
 
