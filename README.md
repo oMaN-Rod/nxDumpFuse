@@ -21,7 +21,7 @@ Will most likely also work on MacOS however I only have an old MBP running 10.10
 
 ~~Instructions on how to use this tool can be found [here](https://yuzu-emu.org/help/quickstart/#merging-split-game-dumps).~~ 
 
-**UPDATE**: As I am sure you have all heard yuzu is shutting down... (RIP Yuzu) Here we are, dropping our hard-earned cash to play games on beast PCs, and then Nintendo goes and squashes the little guys instead of embracing our love for gaming and just giving us what we want. To be fair, I hope they learn from this and provide a gaming experience on par with what we were able to obtain with Yuzu, **on PC!**. Was all about celebrating Nintendo in HD and higher fps, not about piracy. Shame to see such cool projects end like this because of a few bad apples. Let's keep our heads up and find new ways to enjoy our games, legally and with respect. Keep gaming strong, y'all!! Below are the usage instructions copied over from the now removed quick start page.
+**UPDATE**: As I am sure you have all heard yuzu is shutting down... (RIP Yuzu) Here we are, dropping our hard-earned cash to play games on beast PCs, and then Nintendo goes and squashes the little guys instead of embracing our love for gaming and just giving us what we want. To be fair, I hope they learn from this and provide a gaming experience on par with what we were able to obtain with Yuzu, **on PC!**. Was all about celebrating Nintendo in HD and higher fps, not about piracy. Shame to see such cool projects end like this because of a few bad apples. Let's keep our heads up and find new ways to enjoy our games, legally and with respect. Keep gaming strong!! Below are the usage instructions copied over from the now removed quick start page.
 
 ### Merging Split Game Dumps
 
